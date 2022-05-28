@@ -15,10 +15,7 @@ from app.models.base import Base
 
 config = context.config
 
-config.set_main_option(
-    "sqlalchemy.url",
-    os.getenv("DB_URI") or "sqlite+aiosqlite://"
-)
+config.set_main_option("sqlalchemy.url", os.getenv("DB_URI") or "sqlite+aiosqlite://")
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

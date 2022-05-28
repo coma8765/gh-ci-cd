@@ -1,7 +1,7 @@
 import os
 
 from app import app
-from .routes import router
+from app.views.routes import router
 
 app.include_router(router)
 

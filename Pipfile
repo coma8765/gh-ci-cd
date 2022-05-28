@@ -9,6 +9,7 @@ uvicorn = {extras = ["standart"], version = "*"}
 sqlalchemy = {extras = ["asyncio"], version = "*"}
 aiosqlite = "*"
 asyncpg = "*"
+python-jose = {extras = ["cryptography"], version = "*"}
 
 [dev-packages]
 pytest = "*"
