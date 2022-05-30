@@ -6,9 +6,14 @@ name = "pypi"
 [packages]
 fastapi = "*"
 uvicorn = {extras = ["standart"], version = "*"}
+asyncpg = "*"
+passlib = {extras = ["bcrypt"], version = "*"}
+pydantic = {extras = ["email"], version = "*"}
+python-jose = {extras = ["cryptography"], version = "*"}
 
 [dev-packages]
 pytest = "*"
+pytest-asyncio = "*"
 black = "*"
 requests = "*"
 

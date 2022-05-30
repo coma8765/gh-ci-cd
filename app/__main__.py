@@ -1,14 +1,10 @@
 import os
 
-from fastapi import FastAPI
+import uvicorn
 
-from .routes import router
-
-app = FastAPI()
-app.include_router(router)
-
-if __name__ == "__main__":
-    import uvicorn
-
-    # noinspection PyTypeChecker
-    uvicorn.run(app, host=os.getenv("HOST"), port=int(os.getenv("PORT", 8000)))
+uvicorn.run(
+    "app.__init__:app",
+    host=os.getenv("HOST") or "0.0.0.0",
+    port=int(os.getenv("PORT") or 8000),
+    reload=bool(os.getenv("DEBUG", False))
+)
