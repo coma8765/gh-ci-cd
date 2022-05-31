@@ -15,7 +15,7 @@ async def signup(base_user: RefUser, db: Optional[Session]) -> User:
         raise UserAlreadyExists("User already exists")
 
     user_id = await db.fetchval(
-        "insert into users (email, hashed_password) "
+        "INSERT INTO users (email, hashed_password) "
         "VALUES ($1, $2) RETURNING id",
         base_user.email, base_user.get_hash_password()
     )
