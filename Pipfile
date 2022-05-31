@@ -12,10 +12,13 @@ pydantic = {extras = ["email"], version = "*"}
 python-jose = {extras = ["cryptography"], version = "*"}
 
 [dev-packages]
+httpx = "*"
 pytest = "*"
 pytest-asyncio = "*"
 black = "*"
 requests = "*"
+pytest-repeat = "*"
+pytest-xdist = "*"
 
 [requires]
 python_version = "3.10"

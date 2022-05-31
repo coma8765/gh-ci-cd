@@ -7,7 +7,7 @@ from ...controllers.auth import *
 
 
 @pytest.fixture()
-def create_user(session):
+def create_user():
     async def inner(user_ref: Optional[RefUser] = None, db=None):
         if user_ref is None:
             user_ref = RefUser(

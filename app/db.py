@@ -3,7 +3,7 @@ from typing import Optional
 
 import asyncpg
 
-pool: asyncpg.Pool
+pool: Optional[asyncpg.Pool] = None
 Session = asyncpg.Connection
 nested_session: Optional[Session] = None
 

@@ -93,14 +93,14 @@ async def test_signin_incorrect(client):
 
 async def test_check_email_exists(user, client):
     u = await user()
-    r = await client.post(f"/check_email_exists?email={u['email']}",)
+    r = await client.post(f"/check_email_exists?email={u['email']}")
 
     assert r.status_code == status.HTTP_200_OK
     assert r.json() == {"exists": True}
 
 
 async def test_check_email_not_exists(client):
-    r = await client.post(f"/check_email_exists?email=aa@mail.com",)
+    r = await client.post(f"/check_email_exists?email=aa@mail.com")
 
     assert r.status_code == status.HTTP_200_OK
     assert r.json() == {"exists": False}
