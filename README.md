@@ -1,5 +1,5 @@
-# FatAPI app with GitHub CI CD integration
-
+# FastAPI app with GitHub CI CD integration
+[![test-application](https://github.com/coma8765/gh-ci-cd/actions/workflows/github-action-test.yml/badge.svg)](https://github.com/coma8765/gh-ci-cd/actions/workflows/github-action-test.yml)
 ## Require
 * Python 3.10
 
