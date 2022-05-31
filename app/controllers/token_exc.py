@@ -1,2 +1,0 @@
-class TokenDecodeError(Exception):
-    pass
