@@ -1,5 +1,4 @@
-from fastapi import APIRouter, HTTPException
-from starlette import status
+from fastapi import APIRouter, HTTPException, status, Response
 
 from ....controllers import auth as c
 from .schema import *
@@ -8,7 +7,9 @@ router = APIRouter(tags=["auth"])
 
 
 @router.post("/signup", status_code=201, response_model=c.User)
-async def signup(data: c.RefUser):
+async def signup(data: c.RefUser, response: Response):
+    response.headers["Cache-Control"] = "no-store"
+
     try:
         return await c.signup(data)
     except c.UserAlreadyExists as e:
@@ -19,7 +20,9 @@ async def signup(data: c.RefUser):
 
 
 @router.post("/signin", response_model=c.Token)
-async def signin(data: c.RefUser):
+async def signin(data: c.RefUser, response: Response):
+    response.headers["Cache-Control"] = "no-store"
+
     try:
         return c.create_auth_token(
             (await c.signin(data)).id
@@ -33,6 +36,11 @@ async def signin(data: c.RefUser):
         )
 
 
-@router.post("/check_email_exists", response_model=EmailExists)
-async def check_email_exists(email: c.EmailStr):
+@router.post(
+    "/check_email_exists",
+    response_model=EmailExists,
+)
+async def check_email_exists(email: c.EmailStr, response: Response):
+    response.headers["Cache-Control"] = "public, max-age=360"
+
     return EmailExists(exists=await c.check_email_exists(email))
