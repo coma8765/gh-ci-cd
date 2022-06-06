@@ -1,4 +1,5 @@
 import asyncio
+import os
 
 import pytest
 from asyncpg.transaction import Transaction
@@ -25,7 +26,11 @@ async def session(event_loop):
 
         yield
 
-        await tr.rollback()
+        if os.getenv("TEST_NO_ROLLBACK", False):
+            await tr.commit()
+        else:
+            await tr.rollback()
+
 
 
 BaseConfig.orm_mode = True
