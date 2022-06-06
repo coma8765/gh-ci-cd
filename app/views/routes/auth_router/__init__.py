@@ -6,8 +6,8 @@ from .schema import *
 router = APIRouter(tags=["auth"])
 
 
-@router.post("/signup", status_code=201, response_model=c.User)
-async def signup(data: c.RefUser, response: Response):
+@router.post("/signup", status_code=201, response_model=c.UserShort)
+async def signup(data: c.UserRef, response: Response):
     response.headers["Cache-Control"] = "no-store"
 
     try:
@@ -20,7 +20,7 @@ async def signup(data: c.RefUser, response: Response):
 
 
 @router.post("/signin", response_model=c.Token)
-async def signin(data: c.RefUser, response: Response):
+async def signin(data: c.UserRef, response: Response):
     response.headers["Cache-Control"] = "no-store"
 
     try:

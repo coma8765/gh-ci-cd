@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+from typing import Optional, Union
 
 from jose import jwt
 
@@ -9,10 +9,10 @@ from ...dependencies import Session, session
 
 
 @session
-async def signup(base_user: RefUser, db: Optional[Session]) -> User:
+async def signup(base_user: UserRef, db: Optional[Session]) -> UserShort:
     """SignUp user controller"""
     if await check_email_exists(base_user.email, db=db):
-        raise UserAlreadyExists("User already exists")
+        raise UserAlreadyExists("UserShort already exists")
 
     user_id = await db.fetchval(
         "INSERT INTO users (email, hashed_password) "
@@ -20,28 +20,27 @@ async def signup(base_user: RefUser, db: Optional[Session]) -> User:
         base_user.email, base_user.get_hash_password()
     )
 
-    return User(
+    return UserShort(
         id=user_id,
-        email=base_user.email,
-        create_date=datetime.datetime.now()
+        email=base_user.email
     )
 
 
 @session
-async def signin(base_user: RefUser, db: Optional[Session]) -> User:
+async def signin(base_user: UserRef, db: Optional[Session]) -> UserShort:
     """Login user by email and bare password"""
     user = await db.fetchrow(
-        "SELECT id, email, hashed_password, create_date "
+        "SELECT id, email, hashed_password "
         "FROM users WHERE email = $1",
         base_user.email
     )
 
-    if not user or not RefUser.validate_hash_password(
+    if not user or not UserRef.validate_hash_password(
             base_user.password, user["hashed_password"]
     ):
         raise SignInWrong("Incorrect username or password")
 
-    return User(**user)
+    return UserShort(**user)
 
 
 @session
@@ -56,10 +55,23 @@ async def check_email_exists(
 
 
 @session
-async def get_user_by_token(token: Token, db: Optional[Session]) -> User:
+async def get_user_by_token(
+        token: Token,
+        full: bool = False,
+        db: Optional[Session] = None
+) -> Union[UserShort, User]:
     user_id = get_user_id_by_token(token)
-    return User(**await db.fetchrow(
-        "SELECT id, email, hashed_password, create_date "
+
+    if full:
+        return User(**await db.fetchrow(
+            "SELECT id, email, hashed_password, email_confirm, create_date, "
+            "full_name, icon_id, telephone, country, city "
+            "FROM users WHERE id = $1",
+            user_id
+        ))
+
+    return UserShort(**await db.fetchrow(
+        "SELECT id, email, hashed_password " 
         "FROM users WHERE id = $1",
         user_id
     ))

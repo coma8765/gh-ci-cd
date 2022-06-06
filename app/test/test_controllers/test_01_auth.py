@@ -3,7 +3,7 @@ from .fixture_auth import *
 
 @pytest.mark.asyncio
 async def test_signup_base(create_user):
-    d = RefUser(
+    d = UserRef(
         email=f"user-test-{random.randint(10000000, 99999999)}@t.com",
         password="password"
     )
@@ -11,12 +11,10 @@ async def test_signup_base(create_user):
 
     assert u.email == d.email
     assert isinstance(u.id, int)
-    assert isinstance(u.create_date, datetime.datetime)
-    assert u.email_confirm is False
 
 
 async def test_signup_duplicate(create_user):
-    d = RefUser(
+    d = UserRef(
         email=f"user-test-{random.randint(10000000, 99999999)}@t.com",
         password="password"
     )
@@ -27,7 +25,7 @@ async def test_signup_duplicate(create_user):
 
 
 async def test_signin(create_user):
-    r = RefUser(
+    r = UserRef(
         email=f"user-test-{random.randint(10000000, 99999999)}@t.com",
         password="password"
     )
@@ -35,8 +33,7 @@ async def test_signin(create_user):
     u_o = await create_user(r)
     u_l = await signin(r)
 
-    assert u_o.dict(exclude={"create_date"}) == \
-           u_l.dict(exclude={"create_date"})
+    assert u_o.dict() == u_l.dict()
 
 
 def test_token_generation(create_user):
@@ -47,8 +44,7 @@ def test_token_generation(create_user):
 async def test_auth_by_token(create_user):
     u_o = await create_user(None)
     u_l = await get_user_by_token(create_auth_token(u_o.id))
-    assert u_o.dict(exclude={"create_date"}) \
-           == u_l.dict(exclude={"create_date"})
+    assert u_o.dict() == u_l.dict()
 
 
 async def test_auth_by_token_error():

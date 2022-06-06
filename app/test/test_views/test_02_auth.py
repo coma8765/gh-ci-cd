@@ -1,6 +1,5 @@
-import datetime
 import random
-from typing import Any, Callable, Dict, Optional, Awaitable
+from typing import Any, Dict, Optional
 
 import pytest
 from httpx import AsyncClient
@@ -11,10 +10,10 @@ from ...controllers import auth as c
 
 @pytest.fixture()
 def user(client: AsyncClient):
-    async def inner(ref: Optional[c.RefUser] = None):
+    async def inner(ref: Optional[c.UserRef] = None):
         if ref is None:
             r = random.randint(10000000, 99999999)
-            ref = c.RefUser(email=f"test-{r}@mail.com", password="password")
+            ref = c.UserRef(email=f"test-{r}@mail.com", password="password")
 
         j = await client.post(
             "/signup",
@@ -30,7 +29,7 @@ def user(client: AsyncClient):
 
 async def test_signup(client):
     r = random.randint(10000000, 99999999)
-    ref = c.RefUser(email=f"test-{r}@mail.com", password="password")
+    ref = c.UserRef(email=f"test-{r}@mail.com", password="password")
 
     j = await client.post(
         "/signup",
@@ -43,12 +42,11 @@ async def test_signup(client):
 
     assert isinstance(data["id"], int)
     assert data["email"] == ref.email
-    assert data["email_confirm"] is False
 
 
 async def test_signup_duplicate(client):
     r = random.randint(10000000, 99999999)
-    ref = c.RefUser(email=f"test-{r}@mail.com", password="password")
+    ref = c.UserRef(email=f"test-{r}@mail.com", password="password")
 
     r = await client.post(
         "/signup",
@@ -63,7 +61,7 @@ async def test_signup_duplicate(client):
     )
 
     assert e.status_code == status.HTTP_400_BAD_REQUEST
-    assert e.json() == {"detail": "User already exists"}
+    assert e.json() == {"detail": "UserShort already exists"}
 
 
 async def test_signin(user, client):
