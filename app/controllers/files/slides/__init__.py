@@ -1,10 +1,11 @@
-from typing import List
+from typing import Any, Dict, List
+from zipfile import BadZipFile
 
 import pptx
 
 from .schemas import *
 from .. import FileBase
-from ..exc import FileNotFound
+from ..exc import BadFile, FileNotFound
 from ....db import Session
 from ....dependencies import session
 from ....settings import STORAGE, STORAGE_PRESENTATION_IMAGES
@@ -12,17 +13,20 @@ from ....settings import STORAGE, STORAGE_PRESENTATION_IMAGES
 
 @session
 async def get_slides_info(file_id: int, db: Session) -> List[Slide]:
-    filename: Optional[str] = (await db.fetchrow(
+    r: Optional[Dict[str, Any]] = await db.fetchrow(
         "SELECT filename FROM files WHERE id=$1 AND filename LIKE '%.ppt%'",
         file_id
-    )).get("filename", None)
+    )
 
-    if filename is None:
+    if r is None:
         raise FileNotFound
 
-    p: pptx.Presentation() = pptx.Presentation(
-        STORAGE / f"{file_id}{FileBase(filename=filename).extension}",
-    )
+    try:
+        p: pptx.Presentation() = pptx.Presentation(
+            STORAGE / f"{file_id}{FileBase(filename=r['filename']).extension}",
+        )
+    except BadZipFile or ValueError or TypeError:
+        raise BadFile
 
     return list(map(
         lambda x: Slide(

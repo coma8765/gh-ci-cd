@@ -50,6 +50,12 @@ async def test_remove_file(client):
     )) == []
 
 
+async def test_remove_non_exist_file(client):
+    r = await client.delete("/files/-1")
+    assert r.status_code == status.HTTP_404_NOT_FOUND
+    assert r.json() == {"detail": "Not found"}
+
+
 async def test_presentation_info(client):
     file = "./assets/test_files/file.pptx"
     file_id = (await client.post(
@@ -68,3 +74,25 @@ async def test_presentation_info(client):
         "image_path": f"{STORAGE_PRESENTATION_IMAGES}/{file_id}-01.jpg",
         "comment": "Second slide comments"
     }]
+
+
+async def test_presentation_info_not_pptx(client):
+    file_id = (await client.post(
+        "/files",
+        files={"file": ("some-file.txt", open("/dev/null", "rb"))},
+    )).json()['id']
+
+    r = await client.get(f"/files/slides?file_id={file_id}")
+    assert r.status_code == status.HTTP_404_NOT_FOUND
+    assert r.json() == {"detail": "Not found"}
+
+
+async def test_presentation_info_bad_file(client):
+    file_id = (await client.post(
+        "/files",
+        files={"file": ("some-file.pptx", open("/dev/null", "rb"))},
+    )).json()['id']
+
+    r = await client.get(f"/files/slides?file_id={file_id}")
+    assert r.status_code == status.HTTP_400_BAD_REQUEST
+    assert r.json() == {"detail": "File is damaged"}

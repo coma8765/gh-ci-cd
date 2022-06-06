@@ -67,3 +67,23 @@ async def test_presentation_info():
         "image_path": f"{STORAGE_PRESENTATION_IMAGES}/{f.id}-01.jpg",
         "comment": "Second slide comments"
     }]
+
+
+async def test_presentation_info_not_pptx():
+    f = await upload(FileUpload(
+        filename="some.txt",
+        read=(await aiofiles.open("/dev/null", "rb")).read
+    ))
+
+    with pytest.raises(FileNotFound):
+        await get_slides_info(f.id)
+
+
+async def test_presentation_info_bad_file():
+    f = await upload(FileUpload(
+        filename="some.pptx",
+        read=(await aiofiles.open("/dev/null", "rb")).read
+    ))
+
+    with pytest.raises(BadFile):
+        await get_slides_info(f.id)
