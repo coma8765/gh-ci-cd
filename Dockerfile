@@ -20,11 +20,12 @@ WORKDIR /app
 ENV PIPENV_VENV_IN_PROJECT=1
 RUN pip install pipenv
 
-COPY --from=builder /app/.venv /app/.venv
+COPY --from=builder /app/ /app/
 RUN pipenv install --dev --skip-lock
 
 ADD app /app/app
 ADD assets /app/assets
+ADD pytest.ini /app/pytest.ini
 
 CMD pipenv run pytest app
 
