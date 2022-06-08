@@ -25,6 +25,15 @@ def session(func: Callable[Concatenate[DB, PS], Awaitable[RT]]) \
         if nested_session:
             return await func(*args, db=nested_session, **kwargs)
 
+        from .db import pool
+
+        if pool is None:
+            from importlib import reload
+            from . import db as db_
+
+            await db_.startup()
+            reload(db_)
+
         async with pool.acquire() as conn:
             conn: Session
 
