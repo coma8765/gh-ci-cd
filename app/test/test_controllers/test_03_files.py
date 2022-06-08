@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 from ...controllers.files import *
@@ -61,10 +63,14 @@ async def test_presentation_info():
     r = await get_slides_info(f.id)
 
     assert list(map(lambda x: x.dict(), r)) == [{
-        "image_path": f"{STORAGE_PRESENTATION_IMAGES}/{f.id}-00.jpg",
+        "image_path":
+            os.path.relpath(STORAGE_PRESENTATION_IMAGES, STORAGE) +
+            f"/{f.id}-00.jpg",
         "comment": "First slide comments"
     }, {
-        "image_path": f"{STORAGE_PRESENTATION_IMAGES}/{f.id}-01.jpg",
+        "image_path":
+            os.path.relpath(STORAGE_PRESENTATION_IMAGES, STORAGE) +
+            f"/{f.id}-01.jpg",
         "comment": "Second slide comments"
     }]
 

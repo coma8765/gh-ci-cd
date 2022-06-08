@@ -1,6 +1,8 @@
+import os
+
 from starlette import status
 
-from app.settings import STORAGE_PRESENTATION_IMAGES
+from app.settings import STORAGE, STORAGE_PRESENTATION_IMAGES
 
 
 async def test_upload_file(client):
@@ -68,10 +70,14 @@ async def test_presentation_info(client):
     assert r.status_code == status.HTTP_200_OK
 
     assert r.json() == [{
-        "image_path": f"{STORAGE_PRESENTATION_IMAGES}/{file_id}-00.jpg",
+        "image_path":
+            os.path.relpath(STORAGE_PRESENTATION_IMAGES, STORAGE) +
+            f"/{file_id}-00.jpg",
         "comment": "First slide comments"
     }, {
-        "image_path": f"{STORAGE_PRESENTATION_IMAGES}/{file_id}-01.jpg",
+        "image_path":
+            os.path.relpath(STORAGE_PRESENTATION_IMAGES, STORAGE) +
+            f"/{file_id}-01.jpg",
         "comment": "Second slide comments"
     }]
 

@@ -1,3 +1,4 @@
+import os
 from typing import Any, Dict, List
 from zipfile import BadZipFile
 
@@ -30,8 +31,10 @@ async def get_slides_info(file_id: int, db: Session) -> List[Slide]:
 
     return list(map(
         lambda x: Slide(
-            image_path=f"{STORAGE_PRESENTATION_IMAGES}/{file_id}-"
-                       f"{x[0] > 9 and x[0] or f'0{x[0]}'}.jpg",
+            image_path=
+            os.path.relpath(STORAGE_PRESENTATION_IMAGES, STORAGE) +
+            f"/{file_id}-"
+            f"{x[0] > 9 and x[0] or f'0{x[0]}'}.jpg",
             comment=
             x[1].has_notes_slide and
             x[1].notes_slide.notes_text_frame.text.strip() or ""
