@@ -33,5 +33,5 @@ jobs:
         with:
           path: ~/.local/share/virtualenvs
           key: ${{ runner.os }}-python-${{ steps.setup-python.outputs.python-version }}-pipenv-${{ hashFiles('Pipfile.lock') }}
-      - run: pip install pipenv --no-lock && pipenv install --dev && pipenv run python -m assets.sql
+      - run: pip install pipenv && pipenv install --dev && pipenv run python -m assets.sql
       - run: pipenv run pytest app -n auto --dist load
