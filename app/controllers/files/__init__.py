@@ -15,7 +15,8 @@ async def upload(
         db: Session = None
 ) -> File:
     id_ = await db.fetchval(
-        "INSERT INTO files (filename, mimetype) VALUES ($1, $2) RETURNING id",
+        "INSERT INTO files (filename, mimetype) VALUES ($1, $2) "
+        "LIMIT 100 RETURNING id",
         file.filename,
         file.mimetype
     )
@@ -25,13 +26,16 @@ async def upload(
 
     return File(
         **file.dict(exclude={"read"}),
-        id=id_
+        id=id_,
+
     )
 
 
 @session
 async def list_files(db: Session = None) -> list[File]:
-    files = await db.fetch("SELECT id, filename, mimetype FROM files")
+    files = await db.fetch(
+        "SELECT id, filename, mimetype FROM files ORDER BY id DESC LIMIT 100"
+    )
 
     return list(map(lambda x: File(id=x["id"], filename=x["filename"]), files))
 

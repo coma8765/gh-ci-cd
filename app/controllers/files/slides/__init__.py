@@ -5,7 +5,6 @@ from zipfile import BadZipFile
 import pptx
 
 from .schemas import *
-from .. import FileBase
 from ..exc import BadFile, FileNotFound
 from ....db import Session
 from ....dependencies import session
@@ -14,6 +13,11 @@ from ....settings import STORAGE, STORAGE_PRESENTATION_IMAGES
 
 @session
 async def get_slides_info(file_id: int, db: Session) -> List[Slide]:
+    filename = await get_slides_filename(file_id, db)
+    return get_slides_info_by_filename(file_id, "." + filename.split(".")[-1])
+
+
+async def get_slides_filename(file_id: int, db: Session) -> str:
     r: Optional[Dict[str, Any]] = await db.fetchrow(
         "SELECT filename FROM files WHERE id=$1 AND filename LIKE '%.ppt%'",
         file_id
@@ -22,11 +26,15 @@ async def get_slides_info(file_id: int, db: Session) -> List[Slide]:
     if r is None:
         raise FileNotFound
 
+    return r["filename"]
+
+
+def get_slides_info_by_filename(file_id: int, extension: str):
     try:
         p: pptx.Presentation() = pptx.Presentation(
-            STORAGE / f"{file_id}{FileBase(filename=r['filename']).extension}",
+            STORAGE / (str(file_id) + extension),
         )
-    except BadZipFile or ValueError or TypeError:
+    except Exception:
         raise BadFile
 
     return list(map(

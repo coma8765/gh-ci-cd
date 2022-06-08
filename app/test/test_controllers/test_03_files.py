@@ -1,9 +1,9 @@
-import os
-
 import pytest
 
 from ...controllers.files import *
 from ...controllers.files.slides import *
+
+SLIDES_FILE = "./assets/test_files/file.pptx"
 
 
 async def test_upload_file():
@@ -19,13 +19,18 @@ async def test_upload_file():
 
 
 async def test_list_files():
-    refs: List[FileUpload] = [
+    refs: List[FileUpload] = [*[
         FileUpload(
             filename=f"some-file-{i}",
             read=(await aiofiles.open("/dev/null", "rb")).read
         )
+        for i in range(10)], *[
+        FileUpload(
+            filename=f"some-file-{i}.pptx",
+            read=(await aiofiles.open(SLIDES_FILE, "rb")).read
+        )
         for i in range(10)
-    ]
+    ]]
 
     files: List[File] = [await upload(ref) for ref in refs]
 
@@ -33,6 +38,9 @@ async def test_list_files():
 
     for file in files:
         assert ls[file.id].dict() == file.dict()
+
+        if file.filename.endswith(".pptx"):
+            assert ls[file.id].type_addons.count_slides == 2
 
 
 async def test_remove_file():

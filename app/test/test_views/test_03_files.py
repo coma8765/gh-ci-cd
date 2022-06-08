@@ -4,6 +4,8 @@ from starlette import status
 
 from app.settings import STORAGE, STORAGE_PRESENTATION_IMAGES
 
+SLIDES_FILE = "./assets/test_files/file.pptx"
+
 
 async def test_upload_file(client):
     r = await client.post(
@@ -18,13 +20,18 @@ async def test_upload_file(client):
 
 
 async def test_list_files(client):
-    refs = [
+    refs = [*[
         (await client.post(
             "/files",
             files={"file": (f"some-file-{i}.txt", open("/dev/null", "rb"))}
         )).json()
+        for i in range(10)], *[
+        (await client.post(
+            "/files",
+            files={"file": (f"some-file-{i}.pptx", open(SLIDES_FILE, "rb"))}
+        )).json()
         for i in range(10)
-    ]
+    ]]
 
     r = await client.get("/files")
     assert r.status_code == status.HTTP_200_OK
@@ -35,6 +42,9 @@ async def test_list_files(client):
 
     for ref in refs:
         assert list_files[ref["id"]] == ref
+
+        if ref["filename"].endswith(".pptx"):
+            assert list_files[ref["id"]]["type_addons"]["count_slides"] == 2
 
 
 async def test_remove_file(client):
@@ -59,10 +69,9 @@ async def test_remove_non_exist_file(client):
 
 
 async def test_presentation_info(client):
-    file = "./assets/test_files/file.pptx"
     file_id = (await client.post(
         "/files",
-        files={"file": ("some-file.pptx", open(file, "rb"))},
+        files={"file": ("some-file.pptx", open(SLIDES_FILE, "rb"))},
     )).json()['id']
 
     r = await client.get(f"/files/slides?file_id={file_id}")
