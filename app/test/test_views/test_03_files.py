@@ -72,12 +72,12 @@ async def test_presentation_info(client):
     assert r.json() == [{
         "image_path":
             os.path.relpath(STORAGE_PRESENTATION_IMAGES, STORAGE) +
-            f"/{file_id}-00.jpg",
+            f"/{file_id}-01.png",
         "comment": "First slide comments"
     }, {
         "image_path":
             os.path.relpath(STORAGE_PRESENTATION_IMAGES, STORAGE) +
-            f"/{file_id}-01.jpg",
+            f"/{file_id}-02.png",
         "comment": "Second slide comments"
     }]
 

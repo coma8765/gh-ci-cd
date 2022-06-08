@@ -34,7 +34,7 @@ async def get_slides_info(file_id: int, db: Session) -> List[Slide]:
             image_path=
             os.path.relpath(STORAGE_PRESENTATION_IMAGES, STORAGE) +
             f"/{file_id}-"
-            f"{x[0] > 9 and x[0] or f'0{x[0]}'}.jpg",
+            f"{(x[0] + 1 > 9) and (x[0] + 1) or f'0{x[0] + 1}'}.png",
             comment=
             x[1].has_notes_slide and
             x[1].notes_slide.notes_text_frame.text.strip() or ""

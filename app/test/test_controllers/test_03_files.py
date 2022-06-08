@@ -65,12 +65,12 @@ async def test_presentation_info():
     assert list(map(lambda x: x.dict(), r)) == [{
         "image_path":
             os.path.relpath(STORAGE_PRESENTATION_IMAGES, STORAGE) +
-            f"/{f.id}-00.jpg",
+            f"/{f.id}-01.png",
         "comment": "First slide comments"
     }, {
         "image_path":
             os.path.relpath(STORAGE_PRESENTATION_IMAGES, STORAGE) +
-            f"/{f.id}-01.jpg",
+            f"/{f.id}-02.png",
         "comment": "Second slide comments"
     }]
 
