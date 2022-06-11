@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, UploadFile
 from starlette import status
+from starlette.responses import Response
 
 from ....controllers.files import *
 from ....controllers.files.slides import *
@@ -16,7 +17,8 @@ async def upload_route(file: UploadFile):
 
 
 @router.get("", response_model=list[File])
-async def list_files_route():
+async def list_files_route(response: Response):
+    response.headers["Cache-Control"] = "public, must-revalidate"
     return await list_files()
 
 
@@ -27,7 +29,8 @@ async def delete_route(file_id: int):
     except FileNotFound:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Not found"
+            detail="Not found",
+            headers={"Cache-Control": "public, max-age=360"}
         )
 
 

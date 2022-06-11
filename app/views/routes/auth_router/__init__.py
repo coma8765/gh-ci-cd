@@ -36,7 +36,7 @@ async def signin(data: c.UserRef, response: Response):
         )
 
 
-@router.post(
+@router.get(
     "/check_email_exists",
     response_model=EmailExists,
 )
