@@ -12,7 +12,7 @@ ADD Pipfile* .
 RUN pipenv install --skip-lock
 
 
-FROM python:alpine as test
+FROM python:alpine as prod
 
 WORKDIR /app
 
@@ -27,19 +27,5 @@ ADD app /app/app
 ADD assets /app/assets
 ADD pytest.ini /app/pytest.ini
 
-CMD pipenv run pytest app
-
-
-FROM python:alpine as prod
-
-WORKDIR /app
-
-
-ENV PIPENV_VENV_IN_PROJECT=1
-RUN pip install pipenv
-
-COPY --from=builder /app/ /app/
-
-ADD app /app/app
-
+EXPOSE 8000
 CMD pipenv run python -m app

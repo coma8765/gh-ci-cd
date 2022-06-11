@@ -15,10 +15,10 @@ build:
 
 	docker image push docker.aa12.ml/redled/api -a
 
-	docker build \
-	  -t docker.aa12.ml/redled/api-test:${V} \
-	  -t docker.aa12.ml/redled/api-test:latest \
-	  --target test \
-	  .
-
-	docker image push docker.aa12.ml/redled/api-test -a
+# 	docker build \
+# 	  -t docker.aa12.ml/redled/api-test:${V} \
+# 	  -t docker.aa12.ml/redled/api-test:latest \
+# 	  --target test \
+# 	  .
+#
+# 	docker image push docker.aa12.ml/redled/api-test -a
