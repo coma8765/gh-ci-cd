@@ -1,5 +1,5 @@
 import datetime
-from typing import Concatenate, Literal
+from typing import Literal
 
 from passlib.handlers.bcrypt import bcrypt
 from pydantic import BaseModel, EmailStr, SecretStr, constr
@@ -38,5 +38,5 @@ class User(UserShort):
 
 
 class Token(BaseModel):
-    type: Literal['bearer'] = "bearer"
+    type: Literal["bearer"] = "bearer"
     token: constr(max_length=500)

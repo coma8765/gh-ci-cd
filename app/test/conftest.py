@@ -32,5 +32,4 @@ async def session(event_loop):
             await tr.rollback()
 
 
-
 BaseConfig.orm_mode = True

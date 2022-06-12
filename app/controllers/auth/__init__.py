@@ -15,28 +15,24 @@ async def signup(base_user: UserRef, db: Optional[Session]) -> UserShort:
         raise UserAlreadyExists("UserShort already exists")
 
     user_id = await db.fetchval(
-        "INSERT INTO users (email, hashed_password) "
-        "VALUES ($1, $2) RETURNING id",
-        base_user.email, base_user.get_hash_password()
+        "INSERT INTO users (email, hashed_password) " "VALUES ($1, $2) RETURNING id",
+        base_user.email,
+        base_user.get_hash_password(),
     )
 
-    return UserShort(
-        id=user_id,
-        email=base_user.email
-    )
+    return UserShort(id=user_id, email=base_user.email)
 
 
 @session
 async def signin(base_user: UserRef, db: Optional[Session]) -> UserShort:
     """Login user by email and bare password"""
     user = await db.fetchrow(
-        "SELECT id, email, hashed_password "
-        "FROM users WHERE email = $1",
-        base_user.email
+        "SELECT id, email, hashed_password " "FROM users WHERE email = $1",
+        base_user.email,
     )
 
     if not user or not UserRef.validate_hash_password(
-            base_user.password, user["hashed_password"]
+        base_user.password, user["hashed_password"]
     ):
         raise SignInWrong("Incorrect username or password")
 
@@ -44,37 +40,32 @@ async def signin(base_user: UserRef, db: Optional[Session]) -> UserShort:
 
 
 @session
-async def check_email_exists(
-        email: EmailStr,
-        db: Optional[Session]
-) -> bool:
+async def check_email_exists(email: EmailStr, db: Optional[Session]) -> bool:
     """Check email exists in application"""
-    return bool(
-        await db.fetchrow("SELECT id FROM users WHERE email = $1", email)
-    )
+    return bool(await db.fetchrow("SELECT id FROM users WHERE email = $1", email))
 
 
 @session
 async def get_user_by_token(
-        token: Token,
-        full: bool = False,
-        db: Optional[Session] = None
+    token: Token, full: bool = False, db: Optional[Session] = None
 ) -> Union[UserShort, User]:
     user_id = get_user_id_by_token(token)
 
     if full:
-        return User(**await db.fetchrow(
-            "SELECT id, email, hashed_password, email_confirm, create_date, "
-            "full_name, icon_id, telephone, country, city "
-            "FROM users WHERE id = $1",
-            user_id
-        ))
+        return User(
+            **await db.fetchrow(
+                "SELECT id, email, hashed_password, email_confirm, create_date, "
+                "full_name, icon_id, telephone, country, city "
+                "FROM users WHERE id = $1",
+                user_id,
+            )
+        )
 
-    return UserShort(**await db.fetchrow(
-        "SELECT id, email, hashed_password " 
-        "FROM users WHERE id = $1",
-        user_id
-    ))
+    return UserShort(
+        **await db.fetchrow(
+            "SELECT id, email, hashed_password " "FROM users WHERE id = $1", user_id
+        )
+    )
 
 
 def create_auth_token(user_id: int) -> Token:
@@ -83,12 +74,12 @@ def create_auth_token(user_id: int) -> Token:
         token=jwt.encode(
             {
                 "exp": datetime.datetime.now() + datetime.timedelta(days=90),
-                "u": f"a{user_id}"
+                "u": f"a{user_id}",
             },
             os.getenv("JWT_SECRET", None) or "asdamdlmwdmwom",
-            algorithm="HS256"
+            algorithm="HS256",
         ),
-        type="bearer"
+        type="bearer",
     )
 
 
@@ -98,7 +89,7 @@ def get_user_id_by_token(token: Token) -> int:
         d: str = jwt.decode(
             token.token,
             os.getenv("JWT_SECRET", None) or "asdamdlmwdmwom",
-            algorithms=["HS256"]
+            algorithms=["HS256"],
         ).get("u", None)
     except jwt.JWTError:
         raise BadToken

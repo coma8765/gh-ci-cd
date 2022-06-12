@@ -1,23 +1,19 @@
 import functools
-from typing import Awaitable, Callable, Concatenate, NewType, Optional, \
-    ParamSpec
-
+from typing import Awaitable, Callable, Concatenate, NewType, Optional, ParamSpec
 
 from .db import Session
-
 
 PS = ParamSpec("PS", bound=Concatenate[Session, ParamSpec("PS")])
 DB = NewType("db", Session)
 RT = ParamSpec("RT")
 
 
-def session(func: Callable[Concatenate[DB, PS], Awaitable[RT]]) \
-        -> Callable[PS, Awaitable[RT]]:
+def session(
+    func: Callable[Concatenate[DB, PS], Awaitable[RT]]
+) -> Callable[PS, Awaitable[RT]]:
     @functools.wraps(func)
-    async def wrapper(
-            *args, db: Optional[Session] = None, **kwargs
-    ):
-        from .db import pool, nested_session
+    async def wrapper(*args, db: Optional[Session] = None, **kwargs):
+        from .db import nested_session
 
         if db:
             return await func(*args, db=db, **kwargs)

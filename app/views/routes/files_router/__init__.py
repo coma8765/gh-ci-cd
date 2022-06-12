@@ -12,10 +12,7 @@ router = APIRouter(prefix="/files", tags=["files"])
 async def upload_route(file: UploadFile, response: Response):
     response.headers["Cache-Control"] = "no-store"
 
-    return await upload(FileUpload(
-        filename=file.filename,
-        read=file.read
-    ))
+    return await upload(FileUpload(filename=file.filename, read=file.read))
 
 
 @router.get("", response_model=list[File])
@@ -29,19 +26,14 @@ async def delete_route(file_id: int):
     try:
         await remove_file(file_id)
     except FileNotFound:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
 
 
 @router.get(
     "/slides",
     tags=["slides"],
     response_model=list[Slide],
-    responses={
-        400: {"description": "File is damaged"}
-    }
+    responses={400: {"description": "File is damaged"}},
 )
 async def slides_info_route(file_id: int, response: Response):
     try:
@@ -49,13 +41,10 @@ async def slides_info_route(file_id: int, response: Response):
         response.headers["Cache-Control"] = "public, max-age=4579200"
         return r
     except FileNotFound:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
     except BadFile:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="File is damaged",
-            headers={"Cache-Control": "public, max-age=4579200"}
+            headers={"Cache-Control": "public, max-age=4579200"},
         )

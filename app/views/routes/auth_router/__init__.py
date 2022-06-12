@@ -1,7 +1,7 @@
-from fastapi import APIRouter, HTTPException, status, Response
+from fastapi import APIRouter, HTTPException, Response, status
 
-from ....controllers import auth as c
 from .schema import *
+from ....controllers import auth as c
 
 router = APIRouter(tags=["auth"])
 
@@ -13,10 +13,7 @@ async def signup(data: c.UserRef, response: Response):
     try:
         return await c.signup(data)
     except c.UserAlreadyExists as e:
-        raise HTTPException(
-            status_code=400,
-            detail=len(e.args) and e.args[0] or ""
-        )
+        raise HTTPException(status_code=400, detail=len(e.args) and e.args[0] or "")
 
 
 @router.post("/signin", response_model=c.Token)
@@ -24,15 +21,13 @@ async def signin(data: c.UserRef, response: Response):
     response.headers["Cache-Control"] = "no-store"
 
     try:
-        return c.create_auth_token(
-            (await c.signin(data)).id
-        )
+        return c.create_auth_token((await c.signin(data)).id)
 
     except c.SignInWrong as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=len(e.args) and e.args[0] or "Some error",
-            headers={"WWW-Authenticate": "Bearer"}
+            headers={"WWW-Authenticate": "Bearer"},
         )
 
 

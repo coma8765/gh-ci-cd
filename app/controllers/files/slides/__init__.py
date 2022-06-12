@@ -1,6 +1,5 @@
 import os
 from typing import Any, Dict, List
-from zipfile import BadZipFile
 
 import pptx
 
@@ -19,8 +18,7 @@ async def get_slides_info(file_id: int, db: Session) -> List[Slide]:
 
 async def get_slides_filename(file_id: int, db: Session) -> str:
     r: Optional[Dict[str, Any]] = await db.fetchrow(
-        "SELECT filename FROM files WHERE id=$1 AND filename LIKE '%.ppt%'",
-        file_id
+        "SELECT filename FROM files WHERE id=$1 AND filename LIKE '%.ppt%'", file_id
     )
 
     if r is None:
@@ -37,15 +35,16 @@ def get_slides_info_by_filename(file_id: int, extension: str):
     except Exception:
         raise BadFile
 
-    return list(map(
-        lambda x: Slide(
-            image_path=
-            os.path.relpath(STORAGE_PRESENTATION_IMAGES, STORAGE) +
-            f"/{file_id}-"
-            f"{(x[0] + 1 > 9) and (x[0] + 1) or f'0{x[0] + 1}'}.png",
-            comment=
-            x[1].has_notes_slide and
-            x[1].notes_slide.notes_text_frame.text.strip() or ""
-        ),
-        enumerate(p.slides)
-    ))
+    return list(
+        map(
+            lambda x: Slide(
+                image_path=os.path.relpath(STORAGE_PRESENTATION_IMAGES, STORAGE)
+                + f"/{file_id}-"
+                f"{(x[0] + 1 > 9) and (x[0] + 1) or f'0{x[0] + 1}'}.png",
+                comment=x[1].has_notes_slide
+                and x[1].notes_slide.notes_text_frame.text.strip()
+                or "",
+            ),
+            enumerate(p.slides),
+        )
+    )

@@ -24,5 +24,5 @@ async def startup(loop=None):
         f"{os.getenv('POSTGRES_HOST', None) or 'localhost'}:"
         f"{os.getenv('POSTGRES_PORT', None) or 5432}/"
         f"{os.getenv('POSTGRES_DATABASE', None) or 'postgres'}",
-        loop=loop
+        loop=loop,
     )

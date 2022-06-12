@@ -16,8 +16,7 @@ def user(client: AsyncClient):
             ref = c.UserRef(email=f"test-{r}@mail.com", password="password")
 
         j = await client.post(
-            "/signup",
-            json={**ref.dict(), "password": ref.password.get_secret_value()}
+            "/signup", json={**ref.dict(), "password": ref.password.get_secret_value()}
         )
 
         assert j.status_code == status.HTTP_201_CREATED
@@ -32,8 +31,7 @@ async def test_signup(client):
     ref = c.UserRef(email=f"test-{r}@mail.com", password="password")
 
     j = await client.post(
-        "/signup",
-        json={**ref.dict(), "password": ref.password.get_secret_value()}
+        "/signup", json={**ref.dict(), "password": ref.password.get_secret_value()}
     )
 
     assert j.status_code == status.HTTP_201_CREATED
@@ -49,15 +47,13 @@ async def test_signup_duplicate(client):
     ref = c.UserRef(email=f"test-{r}@mail.com", password="password")
 
     r = await client.post(
-        "/signup",
-        json={**ref.dict(), "password": ref.password.get_secret_value()}
+        "/signup", json={**ref.dict(), "password": ref.password.get_secret_value()}
     )
 
     assert r.status_code == status.HTTP_201_CREATED
 
     e = await client.post(
-        "/signup",
-        json={**ref.dict(), "password": ref.password.get_secret_value()}
+        "/signup", json={**ref.dict(), "password": ref.password.get_secret_value()}
     )
 
     assert e.status_code == status.HTTP_400_BAD_REQUEST
@@ -67,8 +63,7 @@ async def test_signup_duplicate(client):
 async def test_signin(user, client):
     d = await user()
     r = await client.post(
-        "/signin",
-        json={"email": d["email"], "password": d["password"]}
+        "/signin", json={"email": d["email"], "password": d["password"]}
     )
 
     assert r.status_code == status.HTTP_200_OK
@@ -81,8 +76,7 @@ async def test_signin(user, client):
 
 async def test_signin_incorrect(client):
     r = await client.post(
-        "/signin",
-        json={"email": "some@mail.com", "password": "random-pass"}
+        "/signin", json={"email": "some@mail.com", "password": "random-pass"}
     )
 
     assert r.status_code == status.HTTP_400_BAD_REQUEST

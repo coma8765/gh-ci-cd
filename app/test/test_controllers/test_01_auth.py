@@ -5,7 +5,7 @@ from .fixture_auth import *
 async def test_signup_base(create_user):
     d = UserRef(
         email=f"user-test-{random.randint(10000000, 99999999)}@t.com",
-        password="password"
+        password="password",
     )
     u = await create_user(d)
 
@@ -16,7 +16,7 @@ async def test_signup_base(create_user):
 async def test_signup_duplicate(create_user):
     d = UserRef(
         email=f"user-test-{random.randint(10000000, 99999999)}@t.com",
-        password="password"
+        password="password",
     )
     await create_user(d)
 
@@ -27,7 +27,7 @@ async def test_signup_duplicate(create_user):
 async def test_signin(create_user):
     r = UserRef(
         email=f"user-test-{random.randint(10000000, 99999999)}@t.com",
-        password="password"
+        password="password",
     )
 
     u_o = await create_user(r)

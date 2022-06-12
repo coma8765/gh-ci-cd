@@ -1,11 +1,10 @@
 import mimetypes
-from typing import Any, Callable, Coroutine, Dict, Optional, Union
+from typing import Callable, Coroutine
 
 from pydantic import BaseModel, Field, constr, validator
 
 from app.controllers.files.exc import BadFile
-from app.controllers.files.slides import get_slides_info, \
-    get_slides_info_by_filename
+from app.controllers.files.slides import get_slides_info_by_filename
 
 mimetypes.init()
 
@@ -15,10 +14,7 @@ class FileBase(BaseModel):
 
     @property
     def mimetype(self) -> str | None:
-        return mimetypes.types_map.get(
-            self.extension,
-            None
-        )
+        return mimetypes.types_map.get(self.extension, None)
 
     @property
     def extension(self) -> str:
@@ -39,18 +35,16 @@ class FileTypeNotImplemented(BaseModel):
 
 class File(FileBase):
     id: int
-    type_addons: FileTypeNotImplemented | FileTypeSlides = \
-        Field(FileTypeNotImplemented(), alias="type_addons")
+    type_addons: FileTypeNotImplemented | FileTypeSlides = Field(
+        FileTypeNotImplemented(), alias="type_addons"
+    )
 
     @validator("type_addons", always=True)
     def set_type_addons(cls, v, values, **kwargs):
-        if \
-                values["filename"].endswith(".ppt") or \
-                values["filename"].endswith(".pptx"):
+        if values["filename"].endswith(".ppt") or values["filename"].endswith(".pptx"):
             try:
                 slides = get_slides_info_by_filename(
-                    values["id"],
-                    "." + values["filename"].split(".")[-1]
+                    values["id"], "." + values["filename"].split(".")[-1]
                 )
 
                 return FileTypeSlides(count_slides=len(slides))

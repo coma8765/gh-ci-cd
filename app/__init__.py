@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from pydantic import BaseConfig
 from starlette.middleware.cors import CORSMiddleware
 
 from . import db

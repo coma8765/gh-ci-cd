@@ -1,5 +1,3 @@
-from typing import List
-
 import aiofiles
 
 from .exc import FileNotFound
@@ -10,24 +8,22 @@ from ...settings import STORAGE
 
 
 @session
-async def upload(
-        file: FileUpload,
-        db: Session = None
-) -> File:
+async def upload(file: FileUpload, db: Session = None) -> File:
     id_ = await db.fetchval(
         "INSERT INTO files (filename, mimetype) VALUES ($1, $2) "
         "LIMIT 100 RETURNING id",
         file.filename,
-        file.mimetype
+        file.mimetype,
     )
 
-    async with aiofiles.open(STORAGE / f"{id_}{file.extension or '.unknown'}", "wb") as f:
+    async with aiofiles.open(
+        STORAGE / f"{id_}{file.extension or '.unknown'}", "wb"
+    ) as f:
         await f.write(await file.read())
 
     return File(
         **file.dict(exclude={"read"}),
         id=id_,
-
     )
 
 
